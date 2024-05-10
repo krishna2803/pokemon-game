@@ -3,27 +3,35 @@ html {
     margin: 0;
     padding: 0;
     height: 100%;
-    /* disable scrolling */
     overflow: hidden;
     box-sizing: border-box;
 }
 
+body {
+    /* background-image: url('../assets/window/bg.jpg'); */
+    /* background-repeat: repeat;
+    background-attachment: fixed; */
+    /* background-size: 25%; */
+    background-color: white;
+}
+
 #canvas-container {
-    width: 480px;
+    width: 640px;
     height: 320px;
-    margin: auto;
+    inset: 0;
 }
 
 #game {
-    width: 100%;
-    height: 100%;
-    /* border: 1px solid black; */
+    /* width: 100%;
+    height: 100%; */
+    /* position: ; */
+    border: 4px solid black;
 }
 
 .grid-container {
     height: 100%;
     width: 100%;
-    background-color: darkorchid;
+    /* background-color: darkorchid; debugging */
     display: grid;
     grid-template-columns: auto 50% auto;
     grid-template-rows: 15% 50% auto;
@@ -32,18 +40,9 @@ html {
     inset: 0;
 }
 
-/* .top,
-.left,
-.center,
-.right,
-.bottom {
-    text-align: center;
-    align-content: center;
-} */
-
 .top {
     inset: 0;
-    background-color: rgb(207, 207, 207);
+    /* background-color: rgb(207, 207, 207); */
     align-items: center;
     grid-column: 1/4;
     overflow: hidden;
@@ -60,11 +59,27 @@ html {
 }
 
 .left {
-    background-color: rgb(207, 207, 207);
+    /* background-color: rgb(207, 207, 207); */
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+}
+
+.left img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 .center {
-    background-color: rgb(207, 207, 207);
+    text-align: center;
+    align-items: center;
+    /* overflow: hidden; */
+    position: relative;
+    /* background-color: rgb(207, 207, 207); */
 }
 
 .right {
@@ -76,14 +91,11 @@ html {
     grid-column: 1/4;
     overflow: hidden;
     position: relative;
+    background-color: rgb(207, 207, 207);
 }
 
 .bottom img {
     width: 100%;
     height: 100%;
     align-items: center;
-    object-fit: contain;
-    position: absolute;
-    top: 0;
-    left: 0;
 }
