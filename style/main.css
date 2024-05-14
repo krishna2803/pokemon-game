@@ -7,12 +7,16 @@ html {
     box-sizing: border-box;
 }
 
+@font-face {
+    font-family: PKMN;
+    src: url('../assets/fonts/PKMN_RBYGSC.ttf');
+}
+  
+
 body {
-    /* background-image: url('../assets/window/bg.jpg'); */
-    /* background-repeat: repeat;
-    background-attachment: fixed; */
-    /* background-size: 25%; */
-    background-color: white;
+    /* background-color: white; */
+    background-image: url('../assets/window/grassland.jpg');
+    background-size: cover;
 }
 
 #canvas-container {
@@ -22,8 +26,8 @@ body {
 }
 
 #game {
-    /* width: 100%;
-    height: 100%; */
+    width: 100%;
+    height: 100%;
     /* position: ; */
     border: 4px solid black;
 }
@@ -31,18 +35,15 @@ body {
 .grid-container {
     height: 100%;
     width: 100%;
-    /* background-color: darkorchid; debugging */
     display: grid;
-    grid-template-columns: auto 50% auto;
+    grid-template-columns: 25% 50% 25%;
     grid-template-rows: 15% 50% auto;
     gap: 1rem;
-    /* grid-auto-rows: minmax(100px, auto); */
     inset: 0;
 }
 
 .top {
     inset: 0;
-    /* background-color: rgb(207, 207, 207); */
     align-items: center;
     grid-column: 1/4;
     overflow: hidden;
@@ -59,7 +60,6 @@ body {
 }
 
 .left {
-    /* background-color: rgb(207, 207, 207); */
     align-items: center;
     overflow: hidden;
     position: relative;
@@ -77,13 +77,15 @@ body {
 .center {
     text-align: center;
     align-items: center;
-    /* overflow: hidden; */
     position: relative;
-    /* background-color: rgb(207, 207, 207); */
 }
 
 .right {
-    background-color: rgb(207, 207, 207);
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+    grid-column: 3/4;
+    font-family: PKMN;
 }
 
 .bottom {
@@ -91,7 +93,6 @@ body {
     grid-column: 1/4;
     overflow: hidden;
     position: relative;
-    background-color: rgb(207, 207, 207);
 }
 
 .bottom img {
