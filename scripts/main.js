@@ -1,6 +1,5 @@
 "use strict";
 
-
 const fetchKantoPokemon = async () => {
     let mons = [];
     await fetch('https://pokeapi.co/api/v2/pokemon?limit=151')
@@ -25,20 +24,20 @@ const roundRect = (ctx, x, y, width, height, radius) => {
     return this;
 }
 
-const lerpColor = (a, b, t) => { 
-    const 
-      ah = +a.replace('#', '0x'),
-      ar = ah >> 16, 
-      ag = ah >> 8 & 0xff,
-      ab = ah & 0xff,
-      bh = +b.replace('#', '0x'),
-      br = bh >> 16,
-      bg = bh >> 8 & 0xff,
-      bb = bh & 0xff,
-      rr = ar + t * (br - ar),
-      rg = ag + t * (bg - ag),
-      rb = ab + t * (bb - ab)
-    ;
+const lerpColor = (a, b, t) => {
+    const
+        ah = +a.replace('#', '0x'),
+        ar = ah >> 16,
+        ag = ah >> 8 & 0xff,
+        ab = ah & 0xff,
+        bh = +b.replace('#', '0x'),
+        br = bh >> 16,
+        bg = bh >> 8 & 0xff,
+        bb = bh & 0xff,
+        rr = ar + t * (br - ar),
+        rg = ag + t * (bg - ag),
+        rb = ab + t * (bb - ab)
+        ;
     return '#' + (0x1000000 + (rr << 16) + (rg << 8) + rb | 0).toString(16).slice(1);
 }
 
@@ -73,8 +72,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // clear the screen first
     ctx.fillStyle = 'white';
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-    ctx.fillStyle = 'black' ;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = 'black';
 
     const ALL_POKEMON = [];
 
@@ -83,21 +82,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         poke.initialize();
         ALL_POKEMON.push(poke);
     }));
-
-
-    // testing
-    // const poke = await fetch(`https://pokeapi.co/api/v2/pokemon/vulpix`);
-    // let data = await poke.json();
-    // // console.log(data);
-    // let __m_moves = [];
-    // let __moves = randomChoice(data.moves, 4);
-    // for (let move of __moves) {
-    //     let m = new Move(move.move.name, move.move.url);
-    //     await m.initialize();
-    //     __m_moves.push(m);
-    // }
-    // console.log(m_moves);
-    // un testing
 
     pkmn_font.load().then(async font => {
         document.fonts.add(font);
@@ -113,23 +97,19 @@ document.addEventListener("DOMContentLoaded", async () => {
             ctx.fillText(text, x, y);
         }
 
-        // play sound
-        // let intro = new Audio('../assets/audio/intro.mp3');
-        // intro.loop = true;
-        // intro.play();
+        // play intro 
+        const intro = new Audio('../assets/audio/intro.mp3');
+        intro.loop = true;
+        intro.play();
 
         // Loading for 1 second
         await new Promise(r => setTimeout(r, 1000.0));
 
-        
-        // console.log(ALL_POKEMON[5]);
-
-
         let player_pokemon = [];
         const choosePlayerPokemonScreen = async () => {
             ctx.fillStyle = 'white';
-            ctx.fillRect(0,0,canvas.width,canvas.height);
-            ctx.fillStyle = 'black' ;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'black';
             let chosen_count = 0;
 
             let m_pokemon = [...ALL_POKEMON];
@@ -163,19 +143,18 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const h = pokemon.sprite.height;
                 const s = 2.0;
                 ctx.drawImage(pokemon.sprite, canvas.width / 2 - w * s / 2, canvas.height * 0.6 - h * s / 2, w * s, h * s);
-                // ctx.scale(0.5, 0.5);
                 write_text(toTitleCase(pokemon.name), canvas.width / 2, canvas.height * 0.6 + h, true);
 
                 if (KEYDOWN) {
-                    
+
                     ctx.fillStyle = 'white';
                     ctx.fillRect(canvas.width * 0.32, canvas.height * 0.32, canvas.width * 0.65625, canvas.height * 0.875);
-                    ctx.fillStyle = 'black' ;
+                    ctx.fillStyle = 'black';
 
                     if (WHATKEY === 'Enter') {
                         chosen_count++;
                         chosen_mons.push(`${chosen_count}. ${toTitleCase(pokemon.name)}`);
-                        
+
                         const pokemon_ghost = m_pokemon.splice(pokemon_index, 1)[0];
                         player_pokemon.push(pokemon_ghost);
                         pokemon_index = pokemon_index % m_pokemon.length;
@@ -200,11 +179,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                     }
                     WHATKEY = undefined;
                     // wait a tiny bit
-                    await new Promise(r => setTimeout(r, 100.0));
+                    await new Promise(r => setTimeout(r, 500.0));
                     // and then clear
                     ctx.fillStyle = 'white';
                     ctx.fillRect(canvas.width * 0.32, canvas.height * 0.32, canvas.width * 0.3471875, canvas.height * 0.875);
-                    ctx.fillStyle = 'black' ;
+                    ctx.fillStyle = 'black';
                 }
 
 
@@ -234,8 +213,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         let ai_pokemons = [];
         const chooseAIPokemonScreen = async () => {
             ctx.fillStyle = 'white';
-            ctx.fillRect(0,0,canvas.width,canvas.height);
-            ctx.fillStyle = 'black' ;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'black';
             let chosen_count = 0;
 
             let m_pokemon = [...ALL_POKEMON];
@@ -258,10 +237,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 ctx.fillStyle = 'black';
                 write_text(" will choose three Pokemon!", (canvas.width + offset) / 2, canvas.height * 0.2, false);
 
-                // ctx.font = `bold ${fontSize * 0.8}px PKMN`;
-                // write_text("Use arrow keys to cycle and enter to select", canvas.width / 2, canvas.height * 0.3, true);
-                // ctx.font = `bold ${fontSize}px PKMN`;
-
                 // draw pokemon
                 const pokemon = m_pokemon[pokemon_index];
                 const w = pokemon.sprite.width;
@@ -273,10 +248,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                 // wait a tiny bit
                 await new Promise(r => setTimeout(r, 100.0));
 
-                
+
                 ctx.fillStyle = 'white';
                 ctx.fillRect(canvas.width * 0.32, canvas.height * 0.32, canvas.width * 0.3471875, canvas.height * 0.875);
-                ctx.fillStyle = 'black' ;
+                ctx.fillStyle = 'black';
                 const r = Math.random();
                 // 5% chance to select this pokemon
                 // 90% chance
@@ -297,10 +272,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                     // wait a tiny bit more
                     await new Promise(r => setTimeout(r, 200.0 + 75 * chosen_count));
                     // and then clear
-                    
+
                     ctx.fillStyle = 'white';
                     ctx.fillRect(canvas.width * 0.32, canvas.height * 0.32, canvas.width * 0.3471875, canvas.height * 0.875);
-                    ctx.fillStyle = 'black' ;
+                    ctx.fillStyle = 'black';
 
                 } else {
                     // else go right
@@ -337,8 +312,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             battle_bg.src = '../assets/battlegrass.png';
 
             ctx.fillStyle = 'white';
-            ctx.fillRect(0,0,canvas.width,canvas.height);
-            ctx.fillStyle = 'black' ;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'black';
 
             const render_move = (move, x, y) => {
                 ctx.fillStyle = move.pp <= 0 ? 'red' : 'black';
@@ -348,7 +323,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             const ball = new Image();
             ball.src = '../assets/ball.webp';
-            
+
             while (true) {
                 // draw background
                 ctx.drawImage(battle_bg, 0, 0, canvas.width, battle_bg.height);
@@ -358,10 +333,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const w = pokemon.back_sprite.width;
                 const h = pokemon.back_sprite.height;
                 const s = 1.75;
-                ctx.drawImage(pokemon.back_sprite, w/4, canvas.height/2-h/2, w * s, h * s);
+                ctx.drawImage(pokemon.back_sprite, w / 4, canvas.height / 2 - h / 2, w * s, h * s);
 
                 // draw player hp bar
-                ctx.font = `${fontSize*0.6}px PKMN`;
+                ctx.font = `${fontSize * 0.6}px PKMN`;
                 ctx.fillStyle = '#151718';
                 roundRect(ctx, canvas.width * 0.7, battle_bg.height - 3.5 * fontSize, canvas.width * 0.3, 3.5 * fontSize, 10);
                 ctx.fill();
@@ -369,14 +344,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                 write_text(`${toTitleCase(pokemon.name)}`, canvas.width * 0.75, battle_bg.height - fontSize * 2.5);
                 write_text(`Lv. ${pokemon.level}`, canvas.width * 0.75, battle_bg.height - fontSize * 1.5);
                 ctx.fillStyle = lerpColor('#ff2020', '#20ff20', pokemon.hp / pokemon.maxhp);
-                write_text(`HP: ${pokemon.hp}/${pokemon.maxhp}`, canvas.width * 0.75, battle_bg.height - fontSize*0.5);
+                write_text(`HP: ${pokemon.hp}/${pokemon.maxhp}`, canvas.width * 0.75, battle_bg.height - fontSize * 0.5);
                 ctx.fillStyle = 'black';
 
                 // draw remaining player pokemon balls
-                for (let i=0; i<player_pokemon.length; i++) {
+                for (let i = 0; i < player_pokemon.length; i++) {
                     ctx.drawImage(ball, canvas.width * 0.65 - 25 * i, battle_bg.height - fontSize, 20, 20);
                 }
-                
+
                 // AI
 
                 // draw ai pokemon
@@ -384,38 +359,38 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const ai_w = ai_pokemon.sprite.width;
                 const ai_h = ai_pokemon.sprite.height;
                 const ai_s = 1.75;
-                ctx.drawImage(ai_pokemon.sprite, canvas.width-ai_w*2, -ai_h/4, ai_w * ai_s, 150);
+                ctx.drawImage(ai_pokemon.sprite, canvas.width - ai_w * 2, -ai_h / 4, ai_w * ai_s, 150);
 
                 // draw ai hp bar
-                ctx.font = `${fontSize*0.6}px PKMN`;
+                ctx.font = `${fontSize * 0.6}px PKMN`;
                 ctx.fillStyle = '#151718';
                 roundRect(ctx, 0, 0, canvas.width * 0.3, 3.5 * fontSize, 10);
                 ctx.fill();
                 ctx.fillStyle = 'white';
-                write_text(`${toTitleCase(ai_pokemon.name)}`, canvas.width*0.05, fontSize);
-                write_text(`Lv. ${ai_pokemon.level}`, canvas.width*0.05, fontSize * 2);
+                write_text(`${toTitleCase(ai_pokemon.name)}`, canvas.width * 0.05, fontSize);
+                write_text(`Lv. ${ai_pokemon.level}`, canvas.width * 0.05, fontSize * 2);
                 ctx.fillStyle = lerpColor('#ff2020', '#20ff20', ai_pokemon.hp / ai_pokemon.maxhp);
-                write_text(`HP: ${ai_pokemon.hp}/${ai_pokemon.maxhp}`, canvas.width*0.05, fontSize * 3);
+                write_text(`HP: ${ai_pokemon.hp}/${ai_pokemon.maxhp}`, canvas.width * 0.05, fontSize * 3);
                 ctx.fillStyle = 'black';
 
                 // draw move and bottom text
-                
+
                 ctx.fillStyle = 'white';
-                ctx.fillRect(0,battle_bg.height,canvas.width,canvas.height);
-                ctx.fillStyle = 'black' ;
+                ctx.fillRect(0, battle_bg.height, canvas.width, canvas.height);
+                ctx.fillStyle = 'black';
 
                 // draw ai remaining pokeball
-                for (let i=0; i<ai_pokemons.length; i++) {
+                for (let i = 0; i < ai_pokemons.length; i++) {
                     ctx.drawImage(ball, canvas.width * 0.3 + 25 * i, 3.5 * fontSize - 20, 20, 20);
                 }
 
                 // draw moves
-                ctx.font = `bold ${fontSize*0.6}px PKMN`;
-                render_move(pokemon.moveset[0], canvas.width*0.05, battle_bg.height + fontSize * 2);
-                render_move(pokemon.moveset[1], canvas.width*0.05, battle_bg.height + fontSize * 4);
-                render_move(pokemon.moveset[2], canvas.width*0.40, battle_bg.height + fontSize * 2);
-                render_move(pokemon.moveset[3], canvas.width*0.40, battle_bg.height + fontSize * 4);
-                
+                ctx.font = `bold ${fontSize * 0.6}px PKMN`;
+                render_move(pokemon.moveset[0], canvas.width * 0.05, battle_bg.height + fontSize * 2);
+                render_move(pokemon.moveset[1], canvas.width * 0.05, battle_bg.height + fontSize * 4);
+                render_move(pokemon.moveset[2], canvas.width * 0.40, battle_bg.height + fontSize * 2);
+                render_move(pokemon.moveset[3], canvas.width * 0.40, battle_bg.height + fontSize * 4);
+
                 if (KEYDOWN) {
                     let attack_result;
 
@@ -440,95 +415,95 @@ document.addEventListener("DOMContentLoaded", async () => {
                         if (ai_pokemons.length == 1) {
                             return 'ai_win';
                         }
-                        
-                        ai_pokemons.splice(0,1);
+
+                        ai_pokemons.splice(0, 1);
                     }
 
                     if (attack_result) {
-                        ctx.font = `bold ${fontSize*0.7}px PKMN`;
+                        ctx.font = `bold ${fontSize * 0.7}px PKMN`;
                         if (attack_result[0] === 'player_win') {
                             // player comments
-                            for (let i=0; i < attack_result[1].length; i++) {
+                            for (let i = 0; i < attack_result[1].length; i++) {
                                 const comment = attack_result[1][i];
-                                write_text(comment,  canvas.width*0.75, battle_bg.height + fontSize * (i+2), false);
+                                write_text(comment, canvas.width * 0.75, battle_bg.height + fontSize * (i + 2), false);
                             }
-                            
+
                             // wait 1 sec
                             await new Promise(r => setTimeout(r, 1000.0));
-                            
+
                             ctx.fillStyle = 'white';
-                            ctx.fillRect(canvas.width*0.75, battle_bg.height, canvas.width, canvas.height);
+                            ctx.fillRect(canvas.width * 0.75, battle_bg.height, canvas.width, canvas.height);
                             ctx.fillStyle = 'black';
 
-                            write_text(`${toTitleCase(ai_pokemon.name)} fainted!`,  canvas.width*0.75, battle_bg.height + fontSize * 2, false);
-                            
+                            write_text(`${toTitleCase(ai_pokemon.name)} fainted!`, canvas.width * 0.75, battle_bg.height + fontSize * 2, false);
+
                             // wait 1 sec
                             await new Promise(r => setTimeout(r, 1000.0));
 
                             if (ai_pokemons.length == 1) {
                                 return 'player_win';
                             }
-                            
-                            ai_pokemons.splice(0,1);
+
+                            ai_pokemons.splice(0, 1);
 
                         } else if (attack_result[0] === 'ai_win') {
-                            
+
                             ctx.fillStyle = 'white';
-                            ctx.fillRect(canvas.width*0.75, battle_bg.height, canvas.width, canvas.height);
-                            ctx.fillStyle = 'black' ;
+                            ctx.fillRect(canvas.width * 0.75, battle_bg.height, canvas.width, canvas.height);
+                            ctx.fillStyle = 'black';
 
                             // ai comments
-                            for (let i=0; i < attack_result[2].length; i++) {
+                            for (let i = 0; i < attack_result[2].length; i++) {
                                 const comment = attack_result[2][i];
-                                write_text(comment,  canvas.width*0.75, battle_bg.height + fontSize * (i+2), false);
+                                write_text(comment, canvas.width * 0.75, battle_bg.height + fontSize * (i + 2), false);
                             }
 
                             // wait 1 sec
                             await new Promise(r => setTimeout(r, 1000.0));
-                            
-                            
+
+
                             ctx.fillStyle = 'white';
-                            ctx.fillRect(canvas.width*0.75, battle_bg.height, canvas.width, canvas.height);
-                            ctx.fillStyle = 'black' ;
-                            write_text(`${toTitleCase(pokemon.name)} fainted!`,  canvas.width*0.75, battle_bg.height + fontSize * 2, false);
-                            
+                            ctx.fillRect(canvas.width * 0.75, battle_bg.height, canvas.width, canvas.height);
+                            ctx.fillStyle = 'black';
+                            write_text(`${toTitleCase(pokemon.name)} fainted!`, canvas.width * 0.75, battle_bg.height + fontSize * 2, false);
+
                             // wait 1 sec
                             await new Promise(r => setTimeout(r, 1000.0));
-                            
+
                             if (player_pokemon.length == 1) {
                                 return 'ai_win';
                             }
-                            
-                            player_pokemon.splice(0,1);
+
+                            player_pokemon.splice(0, 1);
                         } else {
                             // player comments
-                            for (let i=0; i < attack_result[1].length; i++) {
+                            for (let i = 0; i < attack_result[1].length; i++) {
                                 const comment = attack_result[1][i];
-                                write_text(comment,  canvas.width*0.75, battle_bg.height + fontSize * (i+2), false);
+                                write_text(comment, canvas.width * 0.75, battle_bg.height + fontSize * (i + 2), false);
                             }
-                            
+
                             // wait 1 sec
                             await new Promise(r => setTimeout(r, 1000.0));
-                            
+
                             ctx.fillStyle = 'white';
-                            ctx.fillRect(canvas.width*0.75, battle_bg.height, canvas.width, canvas.height);
-                            ctx.fillStyle = 'black' ;
-                            
+                            ctx.fillRect(canvas.width * 0.75, battle_bg.height, canvas.width, canvas.height);
+                            ctx.fillStyle = 'black';
+
                             // ai comments
-                            for (let i=0; i < attack_result[2].length; i++) {
+                            for (let i = 0; i < attack_result[2].length; i++) {
                                 const comment = attack_result[2][i];
-                                write_text(comment,  canvas.width*0.75, battle_bg.height + fontSize * (i+2), false);
+                                write_text(comment, canvas.width * 0.75, battle_bg.height + fontSize * (i + 2), false);
                             }
-                            
+
                             ctx.font = `bold ${fontSize}px PKMN`;
                             // wait 1 sec
                             await new Promise(r => setTimeout(r, 1000.0));
                         }
                     }
                 }
-                
+
                 // 10 Hz
-                await new Promise(r => setTimeout(r, 1000.0/10.0));
+                await new Promise(r => setTimeout(r, 1000.0 / 10.0));
             }
         }
 
@@ -538,20 +513,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             ctx.fillStyle = 'white';
             ctx.font = `bold 40px PKMN`;
-            write_text('GAME OVER', canvas.width/2, canvas.height/4, true);
+            write_text('GAME OVER', canvas.width / 2, canvas.height / 4, true);
 
 
             ctx.font = `bold 28px PKMN`;
             if (result === 'player_win') {
-                write_text('You Win!', canvas.width/2, canvas.height/2, true);
+                write_text('You Win!', canvas.width / 2, canvas.height / 2, true);
             }
 
             if (result === 'ai_win') {
-                write_text('You Lose!', canvas.width/2, canvas.height/2, true);
+                write_text('You Lose!', canvas.width / 2, canvas.height / 2, true);
             }
-            
+
             ctx.font = `bold 20px PKMN`;
-            write_text('Refresh the page to play again.', canvas.width/2, 3*canvas.height/4, true);
+            write_text('Refresh the page to play again.', canvas.width / 2, 3 * canvas.height / 4, true);
         }
 
         await choosePlayerPokemonScreen();
@@ -560,12 +535,25 @@ document.addEventListener("DOMContentLoaded", async () => {
         await new Promise(r => setTimeout(r, 1000.0));
 
         await chooseAIPokemonScreen();
-        
+
+        intro.pause();
+
+        const battle = new Audio('../assets/audio/battle.mp3');
+        battle.loop = true;
+        battle.play();
+
         // wait more
         await new Promise(r => setTimeout(r, 1000.0));
         let result = await battleScreen();
-        
+        battle.pause();
+
+
+        const ending = new Audio('../assets/audio/outro.mp3');
+        ending.loop = true;
+        ending.play();
+
         await gameOverScreen(result);
+
     });
 });
 
@@ -602,9 +590,9 @@ class Pokemon {
         this.back_sprite = new Image();
         this.moveset = [];
         this.types = [];
-        this.hp = Math.floor(80 + Math.random()*40);
+        this.hp = Math.floor(80 + Math.random() * 40);
         this.maxhp = this.hp;
-        this.level = Math.floor(20 + Math.random()*5);
+        this.level = Math.floor(20 + Math.random() * 5);
     }
 
     initialize = async () => {
@@ -652,7 +640,7 @@ class Pokemon {
         let move = this.moveset[player_move_index];
         comments.push(`${toTitleCase(this.name)} used`);
         comments.push(`${toTitleCase(move.name)}`);
-        
+
         const crit_chance = 0.1; // 10% chance for a critical hit
         const level = this.level;
         const power = move.power;
@@ -666,7 +654,7 @@ class Pokemon {
             comments.push('It is very effective!');
         }
 
-        const random = (217 + Math.random() * (256-217)) / 255;
+        const random = (217 + Math.random() * (256 - 217)) / 255;
 
         let damage = ((2 * level * critical / 5 + 2) * power / 50 + 2) * STAB * random;
         damage = Math.floor(damage);
@@ -688,7 +676,7 @@ class Pokemon {
             ai_comments.push('It is very effective!');
         }
 
-        const ai_random = (217 + Math.random() * (256-217)) / 255;
+        const ai_random = (217 + Math.random() * (256 - 217)) / 255;
         let ai_damage = ((2 * ai_level * ai_critical / 5 + 2) * ai_power / 50 + 2) * ai_STAB * ai_random;
         ai_damage = Math.floor(damage);
 
