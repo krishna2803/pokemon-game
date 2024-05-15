@@ -548,9 +548,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         battle.pause();
 
 
-        const ending = new Audio('../assets/audio/outro.mp3');
-        ending.loop = true;
-        ending.play();
+        const outro = new Audio('../assets/audio/outro.mp3');
+        outro.loop = true;
+        outro.play();
 
         await gameOverScreen(result);
 
