@@ -1,15 +1,12 @@
+import { toTitleCase, lerpColor } from './utils.js'
+import { Pokemon } from "./pokemon.js"
+
 "use strict";
 
 const fetchKantoPokemon = async () => {
-    let mons = [];
-    await fetch('https://pokeapi.co/api/v2/pokemon?limit=151')
+    return fetch('https://pokeapi.co/api/v2/pokemon?limit=151')
         .then(res => res.json())
-        .then(allpokemon => {
-            allpokemon.results.forEach(pokemon => {
-                mons.push(pokemon);
-            })
-        })
-    return mons;
+        .then(data => data.results);
 }
 const roundRect = (ctx, x, y, width, height, radius) => {
     if (width < 2 * radius) radius = width / 2;
@@ -24,27 +21,7 @@ const roundRect = (ctx, x, y, width, height, radius) => {
     return this;
 }
 
-const lerpColor = (a, b, t) => {
-    const
-        ah = +a.replace('#', '0x'),
-        ar = ah >> 16,
-        ag = ah >> 8 & 0xff,
-        ab = ah & 0xff,
-        bh = +b.replace('#', '0x'),
-        br = bh >> 16,
-        bg = bh >> 8 & 0xff,
-        bb = bh & 0xff,
-        rr = ar + t * (br - ar),
-        rg = ag + t * (bg - ag),
-        rb = ab + t * (bb - ab)
-        ;
-    return '#' + (0x1000000 + (rr << 16) + (rg << 8) + rb | 0).toString(16).slice(1);
-}
 
-
-const toTitleCase = (str) => str.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
-
-const randomChoice = (arr, numElements) => [...arr].sort(() => Math.random() - 0.5).slice(0, numElements);
 
 let KEYDOWN = false;
 let WHATKEY;
@@ -117,25 +94,22 @@ document.addEventListener("DOMContentLoaded", async () => {
             let pokemon_index = 0;
             let chosen_mons = [];
 
+            // title
+            const st = 'Choose three Pokemon!';
+            let offset = -ctx.measureText(st).width;
+            ctx.fillStyle = 'black';
+            write_text("Choose ", (canvas.width + offset) / 2, canvas.height * 0.2, false);
+            offset += 2 * ctx.measureText("Choose ").width;
+            ctx.fillStyle = 'red';
+            write_text("three", (canvas.width + offset) / 2, canvas.height * 0.2, false);
+            offset += 2 * ctx.measureText('three').width;
+            ctx.fillStyle = 'black';
+            write_text(" Pokemon!", (canvas.width + offset) / 2, canvas.height * 0.2, false);
+
             while (true) {
-                // title
-                const st = 'Choose three Pokemon!';
-                let offset = -ctx.measureText(st).width;
-                ctx.fillStyle = 'black';
-                write_text("Choose ", (canvas.width + offset) / 2, canvas.height * 0.2, false);
-                offset += 2 * ctx.measureText("Choose ").width;
-                ctx.fillStyle = 'red';
-                write_text("three", (canvas.width + offset) / 2, canvas.height * 0.2, false);
-                offset += 2 * ctx.measureText('three').width;
-                ctx.fillStyle = 'black';
-                write_text(" Pokemon!", (canvas.width + offset) / 2, canvas.height * 0.2, false);
-
-
                 ctx.font = `bold ${fontSize * 0.8}px PKMN`;
                 write_text("Use arrow keys to cycle and enter to select", canvas.width / 2, canvas.height * 0.3, true);
                 ctx.font = `bold ${fontSize}px PKMN`;
-
-
 
                 // draw pokemon
                 const pokemon = m_pokemon[pokemon_index];
@@ -146,11 +120,18 @@ document.addEventListener("DOMContentLoaded", async () => {
                 write_text(toTitleCase(pokemon.name), canvas.width / 2, canvas.height * 0.6 + h, true);
 
                 if (KEYDOWN) {
+                    if (WHATKEY !== 'Enter' && WHATKEY !== 'ArrowLeft' && WHATKEY !== 'ArrowRight') {
+                        WHATKEY = undefined;
+                        KEYDOWN = false;
+                        continue;
+                    }
 
-                    ctx.fillStyle = 'white';
-                    ctx.fillRect(canvas.width * 0.32, canvas.height * 0.32, canvas.width * 0.65625, canvas.height * 0.875);
-                    ctx.fillStyle = 'black';
-
+                    const clearPokemon = () => {
+                        ctx.fillStyle = 'white';
+                        ctx.fillRect(canvas.width * 0.32, canvas.height * 0.32, canvas.width * 0.65625, canvas.height * 0.875);
+                        ctx.fillStyle = 'black';    
+                    }
+                    
                     if (WHATKEY === 'Enter') {
                         chosen_count++;
                         chosen_mons.push(`${chosen_count}. ${toTitleCase(pokemon.name)}`);
@@ -177,7 +158,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         const n = m_pokemon.length;
                         pokemon_index = (pokemon_index - 1 + n) % n;
                     }
-                    WHATKEY = undefined;
+                    
                     // wait a tiny bit
                     await new Promise(r => setTimeout(r, 500.0));
                     // and then clear
@@ -253,9 +234,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 ctx.fillRect(canvas.width * 0.32, canvas.height * 0.32, canvas.width * 0.3471875, canvas.height * 0.875);
                 ctx.fillStyle = 'black';
                 const r = Math.random();
-                // 5% chance to select this pokemon
-                // 90% chance
-                if (r < 0.9) {
+                // 20% chance to select this pokemon
+                if (r < 0.2) {
                     chosen_count++;
                     chosen_mons.push(`${chosen_count}. ${toTitleCase(pokemon.name)}`);
 
@@ -270,7 +250,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     write_text(toTitleCase(pokemon.name), canvas.width / 2, canvas.height * 0.6 + h, true);
 
                     // wait a tiny bit more
-                    await new Promise(r => setTimeout(r, 200.0 + 75 * chosen_count));
+                    await new Promise(r => setTimeout(r, 600.0 + 75 * chosen_count));
                     // and then clear
 
                     ctx.fillStyle = 'white';
@@ -316,8 +296,14 @@ document.addEventListener("DOMContentLoaded", async () => {
             ctx.fillStyle = 'black';
 
             const render_move = (move, x, y) => {
+                const default_font = ctx.font;
                 ctx.fillStyle = move.pp <= 0 ? 'red' : 'black';
                 write_text(`${toTitleCase(move.name)} ${move.pp}/${move.maxpp}`, x, y);
+                ctx.font = `bold ${fontSize * 0.4}px PKMN`;
+                if (move) {
+                    write_text(`Base Damage: ${player_pokemon[0].calculateBaseDamage(move)}`, x, y + 15);
+                }
+                ctx.font = default_font;
                 ctx.fillStyle = 'black';
             }
 
@@ -386,10 +372,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 // draw moves
                 ctx.font = `bold ${fontSize * 0.6}px PKMN`;
-                render_move(pokemon.moveset[0], canvas.width * 0.05, battle_bg.height + fontSize * 2);
-                render_move(pokemon.moveset[1], canvas.width * 0.05, battle_bg.height + fontSize * 4);
-                render_move(pokemon.moveset[2], canvas.width * 0.40, battle_bg.height + fontSize * 2);
-                render_move(pokemon.moveset[3], canvas.width * 0.40, battle_bg.height + fontSize * 4);
+                render_move(pokemon.moveset[0], canvas.width * 0.05, battle_bg.height + fontSize * 1.5);
+                render_move(pokemon.moveset[1], canvas.width * 0.05, battle_bg.height + fontSize * 3.25);
+                render_move(pokemon.moveset[2], canvas.width * 0.40, battle_bg.height + fontSize * 1.5);
+                render_move(pokemon.moveset[3], canvas.width * 0.40, battle_bg.height + fontSize * 3.25);
 
                 if (KEYDOWN) {
                     let attack_result;
@@ -420,22 +406,37 @@ document.addEventListener("DOMContentLoaded", async () => {
                     }
 
                     if (attack_result) {
-                        ctx.font = `bold ${fontSize * 0.7}px PKMN`;
-                        if (attack_result[0] === 'player_win') {
-                            // player comments
+                        const showPlayerComments = () => {
                             for (let i = 0; i < attack_result[1].length; i++) {
                                 const comment = attack_result[1][i];
-                                write_text(comment, canvas.width * 0.75, battle_bg.height + fontSize * (i + 2), false);
+                                write_text(comment, canvas.width * 0.725, battle_bg.height + fontSize * (i + 1.5), false);
                             }
+                        }
+
+                        const showAIComments = () => {
+                            for (let i = 0; i < attack_result[2].length; i++) {
+                                const comment = attack_result[2][i];
+                                write_text(comment, canvas.width * 0.725, battle_bg.height + fontSize * (i + 1.5), false);
+                            }
+                        }
+
+                        const clearComments = () => {
+                            ctx.fillStyle = 'white';
+                            ctx.fillRect(canvas.width * 0.725, battle_bg.height, canvas.width, canvas.height);
+                            ctx.fillStyle = 'black';
+                        }
+
+                        ctx.font = `bold ${fontSize * 0.55}px PKMN`;
+                        if (attack_result[0] === 'player_win') {
+                            // player comments
+                            showPlayerComments();
 
                             // wait 1 sec
                             await new Promise(r => setTimeout(r, 1000.0));
 
-                            ctx.fillStyle = 'white';
-                            ctx.fillRect(canvas.width * 0.75, battle_bg.height, canvas.width, canvas.height);
-                            ctx.fillStyle = 'black';
+                            clearComments();
 
-                            write_text(`${toTitleCase(ai_pokemon.name)} fainted!`, canvas.width * 0.75, battle_bg.height + fontSize * 2, false);
+                            write_text(`${toTitleCase(ai_pokemon.name)} fainted!`, canvas.width * 0.725, battle_bg.height + fontSize * 2, false);
 
                             // wait 1 sec
                             await new Promise(r => setTimeout(r, 1000.0));
@@ -447,25 +448,15 @@ document.addEventListener("DOMContentLoaded", async () => {
                             ai_pokemons.splice(0, 1);
 
                         } else if (attack_result[0] === 'ai_win') {
-
-                            ctx.fillStyle = 'white';
-                            ctx.fillRect(canvas.width * 0.75, battle_bg.height, canvas.width, canvas.height);
-                            ctx.fillStyle = 'black';
-
                             // ai comments
-                            for (let i = 0; i < attack_result[2].length; i++) {
-                                const comment = attack_result[2][i];
-                                write_text(comment, canvas.width * 0.75, battle_bg.height + fontSize * (i + 2), false);
-                            }
+                            showAIComments();
 
                             // wait 1 sec
                             await new Promise(r => setTimeout(r, 1000.0));
 
+                            clearComments();
 
-                            ctx.fillStyle = 'white';
-                            ctx.fillRect(canvas.width * 0.75, battle_bg.height, canvas.width, canvas.height);
-                            ctx.fillStyle = 'black';
-                            write_text(`${toTitleCase(pokemon.name)} fainted!`, canvas.width * 0.75, battle_bg.height + fontSize * 2, false);
+                            write_text(`${toTitleCase(pokemon.name)} fainted!`, canvas.width * 0.725, battle_bg.height + fontSize * 2, false);
 
                             // wait 1 sec
                             await new Promise(r => setTimeout(r, 1000.0));
@@ -477,23 +468,15 @@ document.addEventListener("DOMContentLoaded", async () => {
                             player_pokemon.splice(0, 1);
                         } else {
                             // player comments
-                            for (let i = 0; i < attack_result[1].length; i++) {
-                                const comment = attack_result[1][i];
-                                write_text(comment, canvas.width * 0.75, battle_bg.height + fontSize * (i + 2), false);
-                            }
+                            showPlayerComments();
 
                             // wait 1 sec
                             await new Promise(r => setTimeout(r, 1000.0));
 
-                            ctx.fillStyle = 'white';
-                            ctx.fillRect(canvas.width * 0.75, battle_bg.height, canvas.width, canvas.height);
-                            ctx.fillStyle = 'black';
+                            clearComments();
 
                             // ai comments
-                            for (let i = 0; i < attack_result[2].length; i++) {
-                                const comment = attack_result[2][i];
-                                write_text(comment, canvas.width * 0.75, battle_bg.height + fontSize * (i + 2), false);
-                            }
+                            showAIComments();
 
                             ctx.font = `bold ${fontSize}px PKMN`;
                             // wait 1 sec
@@ -556,166 +539,3 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     });
 });
-
-class Move {
-    constructor(name, url) {
-        this.name = name;
-        this.url = url;
-    }
-
-    initialize = async () => {
-        try {
-            const response = await fetch(this.url);
-            if (!response.ok) {
-                throw new Error('Failed to fetch move');
-            }
-            const data = await response.json();
-
-            this.power = data.power;
-            this.pp = data.pp;
-            this.maxpp = this.pp;
-            this.priority = data.priority;
-            this.type = data.type;
-
-        } catch (error) {
-            console.error('Some error occured!: ', error);
-        }
-    }
-}
-
-class Pokemon {
-    constructor(name) {
-        this.name = name;
-        this.sprite = new Image();
-        this.back_sprite = new Image();
-        this.moveset = [];
-        this.types = [];
-        this.hp = Math.floor(80 + Math.random() * 40);
-        this.maxhp = this.hp;
-        this.level = Math.floor(20 + Math.random() * 5);
-    }
-
-    initialize = async () => {
-        try {
-            const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${this.name}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch sprite');
-            }
-            const data = await response.json();
-            // 1% chance of shiny
-            if (Math.random() < 0.01) {
-                this.sprite.src = data.sprites.front_shiny || data.sprites.front_default;
-                this.back_sprite.src = data.sprites.back_shiny || data.sprites.back_default;
-            } else {
-                this.sprite.src = data.sprites.front_default;
-                this.back_sprite.src = data.sprites.back_default;
-            }
-
-            // load types
-            for (let type of data.types) {
-                this.types.push(type.type.name);
-            }
-
-            // load moves
-            let moves = randomChoice(data.moves, 4);
-            for (let move of moves) {
-                let m = new Move(move.move.name, move.move.url);
-                await m.initialize();
-                this.moveset.push(m);
-            }
-        } catch (error) {
-            console.error('Some error occured!: ', error);
-        }
-    }
-
-    attack = (that, player_move_index, ai_move_index) => {
-        if (this.moveset[player_move_index].pp <= 0) return;
-        this.moveset[player_move_index].pp -= 1;
-
-        // damage calculation
-        // https://bulbapedia.bulbagarden.net/wiki/Damage
-
-        let comments = [];
-
-        let move = this.moveset[player_move_index];
-        comments.push(`${toTitleCase(this.name)} used`);
-        comments.push(`${toTitleCase(move.name)}`);
-
-        const crit_chance = 0.1; // 10% chance for a critical hit
-        const level = this.level;
-        const power = move.power;
-        const critical = Math.random() < crit_chance ? 2 : 1;
-        if (critical === 2) {
-            comments.push('A critical hit!');
-        }
-
-        const STAB = this.types.includes(move.type) ? 1.5 : 1;
-        if (STAB === 1.5) {
-            comments.push('It is very effective!');
-        }
-
-        const random = (217 + Math.random() * (256 - 217)) / 255;
-
-        let damage = ((2 * level * critical / 5 + 2) * power / 50 + 2) * STAB * random;
-        damage = Math.floor(damage);
-
-        let ai_comments = [];
-        let ai_move = that.moveset[ai_move_index];
-        ai_comments.push(`${toTitleCase(that.name)} used`);
-        ai_comments.push(`${toTitleCase(ai_move.name)}`);
-
-        const ai_level = that.level;
-        const ai_power = ai_move.power;
-        const ai_critical = Math.random() < crit_chance ? 2 : 1;
-        if (ai_critical === 2) {
-            ai_comments.push('A critical hit!');
-        }
-
-        const ai_STAB = that.types.includes(ai_move.type) ? 1.5 : 1;
-        if (ai_STAB === 1.5) {
-            ai_comments.push('It is very effective!');
-        }
-
-        const ai_random = (217 + Math.random() * (256 - 217)) / 255;
-        let ai_damage = ((2 * ai_level * ai_critical / 5 + 2) * ai_power / 50 + 2) * ai_STAB * ai_random;
-        ai_damage = Math.floor(damage);
-
-        if (move.priority > ai_move.priority) {
-            that.hp = Math.max(0, that.hp - damage);
-            if (that.hp == 0) {
-                return ['player_win', comments, null];
-            }
-            this.hp = Math.max(0, this.hp - ai_damage);
-            if (this.hp == 0)
-                return ['ai_win', comments, ai_comments];
-        } else if (move.priority < ai_move.priority) {
-            this.hp = Math.max(0, this.hp - ai_damage);
-            if (this.hp == 0)
-                return ['ai_win', null, ai_comments];
-            that.hp = Math.max(0, that.hp - damage);
-            if (that.hp == 0) {
-                return ['player_win', comments, ai_comments];
-            }
-        } else {
-            if (Math.random() < 0.5) {
-                that.hp = Math.max(0, that.hp - damage);
-                if (that.hp == 0) {
-                    return ['player_win', comments, null];
-                }
-                this.hp = Math.max(0, this.hp - ai_damage);
-                if (this.hp == 0)
-                    return ['ai_win', comments, ai_comments];
-            } else {
-                this.hp = Math.max(0, this.hp - ai_damage);
-                if (this.hp == 0)
-                    return ['ai_win', null, ai_comments];
-                that.hp = Math.max(0, that.hp - damage);
-                if (that.hp == 0) {
-                    return ['player_win', comments, ai_comments];
-                }
-            }
-        }
-        return [null, comments, ai_comments];
-    }
-}
-
